@@ -1,0 +1,74 @@
+[
+  {
+    "scenario": "Full Model",
+    "model": "linear",
+    "features": 10,
+    "r2": 0.6729642787403043,
+    "mae": 12.935096660222053,
+    "rmse": 18.121522501507716
+  },
+  {
+    "scenario": "Full Model",
+    "model": "rf",
+    "features": 10,
+    "r2": 0.9956797883066184,
+    "mae": 1.341977551020404,
+    "rmse": 2.0828097433368216
+  },
+  {
+    "scenario": "Full Model",
+    "model": "gb",
+    "features": 10,
+    "r2": 0.9899934333096965,
+    "mae": 2.3689300470146164,
+    "rmse": 3.1698567306022283
+  },
+  {
+    "scenario": "Practical Minimal Model",
+    "model": "linear",
+    "features": 4,
+    "r2": 0.6381651265011887,
+    "mae": 14.225988281800383,
+    "rmse": 19.06129037886432
+  },
+  {
+    "scenario": "Practical Minimal Model",
+    "model": "rf",
+    "features": 4,
+    "r2": 0.9867779440774506,
+    "mae": 2.7395176205710396,
+    "rmse": 3.643733298206051
+  },
+  {
+    "scenario": "Practical Minimal Model",
+    "model": "gb",
+    "features": 4,
+    "r2": 0.9883946976834596,
+    "mae": 2.7064993262493253,
+    "rmse": 3.413699713706802
+  },
+  {
+    "scenario": "Weak Baseline Model",
+    "model": "linear",
+    "features": 3,
+    "r2": 0.40255059651338543,
+    "mae": 18.192292720781122,
+    "rmse": 24.493319775568562
+  },
+  {
+    "scenario": "Weak Baseline Model",
+    "model": "rf",
+    "features": 3,
+    "r2": 0.5239622406656121,
+    "mae": 16.512762005308904,
+    "rmse": 21.863404395619856
+  },
+  {
+    "scenario": "Weak Baseline Model",
+    "model": "gb",
+    "features": 3,
+    "r2": 0.5306945454075573,
+    "mae": 16.35912318566623,
+    "rmse": 21.708253655052662
+  }
+]

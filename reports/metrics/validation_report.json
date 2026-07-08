@@ -1,0 +1,67 @@
+{
+  "dataset_shape": {
+    "rows": 486,
+    "columns": 13
+  },
+  "columns": [
+    "BOX",
+    "AER",
+    "Lwratio",
+    "box_num",
+    "box_ver",
+    "rich_num",
+    "temp",
+    "vel",
+    "inlet_angle",
+    "window",
+    "old_new",
+    "inlet_angle_sine",
+    "richardson_num"
+  ],
+  "data_types": {
+    "BOX": "object",
+    "AER": "float64",
+    "Lwratio": "int64",
+    "box_num": "int64",
+    "box_ver": "int64",
+    "rich_num": "object",
+    "temp": "int64",
+    "vel": "float64",
+    "inlet_angle": "int64",
+    "window": "object",
+    "old_new": "object",
+    "inlet_angle_sine": "float64",
+    "richardson_num": "float64"
+  },
+  "missing_values": {
+    "BOX": 0,
+    "AER": 0,
+    "Lwratio": 0,
+    "box_num": 0,
+    "box_ver": 0,
+    "rich_num": 0,
+    "temp": 0,
+    "vel": 0,
+    "inlet_angle": 0,
+    "window": 0,
+    "old_new": 0,
+    "inlet_angle_sine": 0,
+    "richardson_num": 0
+  },
+  "total_missing_cells": 0,
+  "duplicate_rows": 0,
+  "constant_columns": [
+    "BOX"
+  ],
+  "aer_statistics": {
+    "min": 18.93,
+    "max": 197.9,
+    "mean": 53.76477366255144,
+    "median": 42.99,
+    "std": 35.6793315123078
+  },
+  "validation_issues": [
+    "Column 'BOX' is constant with value: AERStall "
+  ],
+  "is_valid": false
+}

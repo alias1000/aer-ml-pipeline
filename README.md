@@ -59,8 +59,7 @@ These results are an initial benchmark based on a random split. A stronger valid
 
 ```bash
 pip install -r requirements.txt
-cd src
-python pipeline.py
+python src/pipeline.py
 pytest tests/
 ```
 
@@ -68,7 +67,7 @@ All outputs are saved to `data/processed/`, `reports/`, and `models/`.
 
 ## Project structure
 
-```
+```text
 aer-ml-pipeline/
 ├── data/
 │   ├── raw/aer_raw.csv
@@ -87,4 +86,9 @@ aer-ml-pipeline/
 ├── tests/
 ├── requirements.txt
 └── README.md
+```
+
+## Notes
+
+This is a small applied ML pipeline based on my research area. The current version focuses on reproducibility and comparison of feature scenarios, not on deployment.
 ```

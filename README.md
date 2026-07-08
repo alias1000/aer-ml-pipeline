@@ -2,62 +2,89 @@
 
 This repository contains a small machine-learning pipeline for predicting Air Exchange Rate (AER) from barn ventilation data.
 
-I built this project to make the workflow easier to rerun and inspect: checking the raw CSV file, cleaning columns, rebuilding angle features, comparing feature sets, training regression models, and saving the results.
+I built it to make the workflow easier to rerun and inspect. The pipeline checks the raw CSV file, cleans the columns, rebuilds angle-based features, compares different feature sets, trains regression models, and saves the outputs.
 
 The dataset is related to my research context on naturally ventilated livestock buildings. The main comparison is between a full feature set and a smaller practical feature set using only temperature, inlet angle, and window opening state.
 
 ## What the pipeline does
 
-- checks the raw CSV for missing values, duplicate rows, constant columns, and invalid categories
-- removes constant or redundant columns (`BOX`, `box_ver`, and the old `inlet_angle_sine`)
-- recalculates angle features correctly using degrees:
+- checks missing values, duplicate rows, constant columns, and invalid categories
+- removes constant or redundant columns such as `BOX`, `box_ver`, and the old `inlet_angle_sine`
+- recalculates angle features using:
   - `sin(deg2rad(inlet_angle))`
   - `cos(deg2rad(inlet_angle))`
-- compares three feature scenarios to test the feature trade-off
-- trains Linear Regression, Random Forest, and Gradient Boosting models on each scenario
+- compares three feature scenarios
+- trains Linear Regression, Random Forest, and Gradient Boosting models
 - saves metrics, plots, and the best model
 
-## Dataset
+## Feature scenarios
 
-486 samples from barn ventilation experiments. Features include temperature, air velocity, inlet angle, window state, thermal and geometric parameters. Target: AER (continuous, 18.93–197.90).
+### Full model
 
-## Key Decisions & Trade-Offs
+Uses the available ventilation and geometry-related variables:
 
-- Feature scenarios test whether a minimal set (4 inputs) can match the full model (10 inputs)
-- Three algorithms: Linear Regression (baseline), Random Forest and Gradient Boosting (ensemble)
-- Fixed random seeds ensure reproducibility
-- Trigonometric features recalculated correctly: `sin(deg2rad(inlet_angle))`, `cos(deg2rad(inlet_angle))`
+`temp`, `vel`, `inlet_angle_sine`, `inlet_angle_cosine`, `window`, `rich_num`, `richardson_num`, `lwratio`, `box_num`, `old_new`
 
-## Reproducibility
+### Practical minimal model
 
-- Modular code: validation → cleaning → engineering → training → evaluation
-- Fixed random seeds (42) for all splits and model initialization
-- Automated metrics and figure generation
-- Ready for version control
+Uses only four practical inputs:
 
-## Potential Extensions
+`temp`, `inlet_angle_sine`, `inlet_angle_cosine`, `window`
 
-- K-Fold and GroupKFold cross-validation
-- Hyperparameter tuning
-- Feature interactions
-- Model explainability (SHAP)
+### Weak baseline
 
-## How to Run
+Uses the same variables as the minimal model, but without `window`:
 
-```bash
-pip install -r requirements.txt
-python src/pipeline.py
-pytest tests/
-```
+`temp`, `inlet_angle_sine`, `inlet_angle_cosine`
 
 ## Results
 
-Random 80/20 split, best model per scenario:
+Using a random 80/20 train-test split, the full model with Random Forest gave the best overall result:
 
-- Full Model (Random Forest): R² = 0.9957, MAE = 1.34, RMSE = 2.08
-- Practical Minimal (Gradient Boosting): R² = 0.9884, MAE = 2.71, RMSE = 3.41
-- Weak Baseline (no window): R² = 0.5307
+- R² = 0.9957
+- MAE = 1.34
+- RMSE = 2.08
 
-## Notes
+The practical minimal model with Gradient Boosting reached:
 
-The current results are based on a random 80/20 train-test split. I treat them as an initial benchmark. A stronger version of the project would add KFold and GroupKFold validation.
+- R² = 0.9884
+- MAE = 2.71
+- RMSE = 3.41
+
+The weak baseline without `window` dropped to R² = 0.5307. This suggests that window opening state carries important information for AER prediction in this dataset.
+
+These results are an initial benchmark based on a random split. A stronger validation step would be to add KFold and GroupKFold cross-validation.
+
+## How to run
+
+```bash
+pip install -r requirements.txt
+cd src
+python pipeline.py
+pytest tests/
+```
+
+All outputs are saved to `data/processed/`, `reports/`, and `models/`.
+
+## Project structure
+
+```
+aer-ml-pipeline/
+├── data/
+│   ├── raw/aer_raw.csv
+│   └── processed/aer_cleaned.csv
+├── src/
+│   ├── pipeline.py
+│   ├── data_validation.py
+│   ├── data_cleaning.py
+│   ├── feature_engineering.py
+│   ├── train_model.py
+│   └── evaluate_model.py
+├── reports/
+│   ├── metrics/
+│   └── figures/
+├── models/best_model.pkl
+├── tests/
+├── requirements.txt
+└── README.md
+```

@@ -1,27 +1,19 @@
-# AER ML Data Pipeline
+# AER ML Pipeline
 
-## Project Objective
+This repository contains a small machine-learning pipeline for AER (Air Exchange Rate) prediction from barn ventilation data.
 
-This project demonstrates a **reproducible data pipeline for scientific regression modeling**, using Air Exchange Rate (AER) prediction as the applied engineering case study.
+I built this project to organize and test a reproducible workflow: validating the raw data, cleaning columns, fixing incorrect angle features, comparing different feature sets, and training models. The main question I wanted to explore was whether a small set of practical inputs—temperature, inlet angle, and window state—could capture most of the variation in AER.
 
-The goal is not only to train a machine-learning model, but to showcase the engineering practices, data workflows, and reproducibility standards essential for professional data science and ML work.
+## What the pipeline does
 
-## Context
-
-The dataset contains measurements from barn ventilation experiments / CFD simulations, with environmental and structural parameters. The task is to predict Air Exchange Rate from ventilation characteristics, inlet geometry, and thermal conditions.
-
-## Skills Demonstrated
-
-This project illustrates proficiency in:
-
-- **Data Validation**: Comprehensive checks for data quality, missing values, duplicates, and categorical validity
-- **Data Cleaning**: Standardization, type conversion, removal of invalid/constant/redundant features
-- **Feature Engineering**: Correct recalculation of derived features (trigonometric transformations)
-- **Machine-Learning Pipeline Design**: Modular, reproducible workflow using scikit-learn
-- **Model Comparison**: Multiple algorithms and feature scenarios for performance analysis
-- **Evaluation & Visualization**: Residual plots, predictions vs actual, scenario/model comparisons
-- **Automated Reporting**: Metrics export, figure generation, model persistence
-- **GitHub-Ready Project Structure**: Professional organization with documentation, tests, and version control
+- checks the raw CSV for missing values, duplicate rows, constant columns, and invalid categories
+- removes constant or redundant columns (`BOX`, `box_ver`, and the old `inlet_angle_sine`)
+- recalculates angle features correctly using degrees:
+  - `sin(deg2rad(inlet_angle))`
+  - `cos(deg2rad(inlet_angle))`
+- compares three feature scenarios to test the feature trade-off
+- trains Linear Regression, Random Forest, and Gradient Boosting models on each scenario
+- saves metrics, plots, and the best model
 
 ## Dataset
 
@@ -94,106 +86,51 @@ temp, inlet_angle_sine, inlet_angle_cosine
 - **MAE**: Mean absolute error (average prediction error)
 - **RMSE**: Root mean squared error (penalizes large errors)
 
-## Results (Random 80/20 Train-Test Split)
+## Results
 
-### Model Performance by Scenario
+Using a random 80/20 train-test split, the full model with Random Forest achieved the best overall performance:
 
-| Scenario | Best Model | R² | MAE | RMSE | Observations |
-|----------|-----------|-----|-------|--------|------------|
-| **Full Model** (10 features) | Random Forest | 0.9957 | 1.34 | 2.08 | Highest accuracy; includes all features |
-| **Practical Minimal** (4 features) | Gradient Boosting | 0.9884 | 2.71 | 3.41 | **Comparable performance** with only 4 features |
-| **Weak Baseline** (3 features) | Gradient Boosting | 0.5307 | 16.36 | 21.71 | Without window information, performance drops significantly |
+- **R² = 0.9957** | MAE = 1.34 | RMSE = 2.08
 
-### Key Findings
+The practical minimal model used only four inputs: `temp`, `inlet_angle_sine`, `inlet_angle_cosine`, and `window`. With Gradient Boosting, it still reached:
 
-Although the full model achieved the highest accuracy, **the practical minimal model performed nearly as well using only temperature, inlet angle, and window opening state**. This suggests that a small set of practical ventilation descriptors can capture most of the predictive information for AER in this dataset.
+- **R² = 0.9884** | MAE = 2.71 | RMSE = 3.41
 
-The dramatic performance drop in the weak baseline model (R² = 0.53 without window state) highlights the **critical importance of window opening state** for predicting AER, validating the real-world significance of this feature.
+The weak baseline without `window` dropped to **R² = 0.5307**. This suggests that the window opening state carries important information for AER prediction in this dataset.
 
-**Note**: These results are based on a random 80/20 train-test split (test set: 98 samples). For production models, cross-validation and hold-out validation on truly independent data would be recommended.
+**Note**: These results are based on a random split of 98 test samples. I treat these as an initial benchmark rather than final validation.
 
 ## How to Run
 
-### Prerequisites
 ```bash
 pip install -r requirements.txt
-```
-
-### Execute Full Pipeline
-```bash
-cd src
-python pipeline.py
-```
-
-This single command runs:
-1. Data validation and reporting
-2. Data cleaning and preprocessing
-3. Feature engineering
-4. Training of all 3 scenarios × 3 models
-5. Model evaluation and figure generation
-6. Metrics and model persistence
-
-### Expected Output
-
-```
-Pipeline results saved to:
-- data/processed/aer_cleaned.csv       (cleaned dataset)
-- reports/metrics/validation_report.json (data quality report)
-- reports/metrics/model_metrics.csv     (all model results)
-- reports/metrics/model_metrics.json    (metrics as JSON)
-- models/best_model.pkl                 (best trained model)
-- reports/figures/                      (visualizations)
-```
-
-### Run Tests
-```bash
+python src/pipeline.py
 pytest tests/
 ```
+
+All pipeline stages are orchestrated in `src/pipeline.py`. Output files (cleaned data, metrics, plots, trained model) are saved automatically to `data/processed/`, `reports/`, and `models/`.
 
 ## Project Structure
 
 ```
-aer-ml-data-pipeline/
-│
+aer-ml-pipeline/
 ├── data/
-│   ├── raw/
-│   │   └── aer_raw.csv                 (input: raw dataset)
-│   └── processed/
-│       └── aer_cleaned.csv             (output: cleaned dataset)
-│
+│   ├── raw/aer_raw.csv
+│   └── processed/aer_cleaned.csv
 ├── src/
-│   ├── data_validation.py              (validates raw data)
-│   ├── data_cleaning.py                (cleans and standardizes)
-│   ├── feature_engineering.py          (creates derived features)
-│   ├── train_model.py                  (trains 3 scenarios, 3 models each)
-│   ├── evaluate_model.py               (generates plots and metrics)
-│   └── pipeline.py                     (orchestrates full workflow)
-│
+│   ├── pipeline.py
+│   ├── data_validation.py
+│   ├── data_cleaning.py
+│   ├── feature_engineering.py
+│   ├── train_model.py
+│   └── evaluate_model.py
 ├── reports/
 │   ├── metrics/
-│   │   ├── validation_report.json      (data quality checks)
-│   │   ├── model_metrics.csv           (model performance table)
-│   │   └── model_metrics.json          (metrics as JSON)
 │   └── figures/
-│       ├── predicted_vs_actual.png     (actual vs predicted scatter)
-│       ├── residual_plot.png           (residuals analysis)
-│       ├── scenario_comparison.png     (metrics by scenario)
-│       ├── model_comparison.png        (metrics by algorithm)
-│       └── feature_importance.png      (top features, if available)
-│
-├── models/
-│   └── best_model.pkl                  (serialized best model)
-│
+├── models/best_model.pkl
 ├── tests/
-│   └── test_data_cleaning.py           (unit tests)
-│
-├── notebooks/
-│   └── 01_exploration.ipynb            (optional: exploratory analysis)
-│
-├── requirements.txt                     (Python dependencies)
-├── .gitignore                          (Git exclusions)
-├── README.md                           (this file)
-└── LICENSE                             (optional)
+├── requirements.txt
+└── README.md
 ```
 
 ## Key Decisions & Trade-Offs
@@ -218,18 +155,8 @@ aer-ml-data-pipeline/
 
 ## Potential Extensions
 
-- **Cross-Validation**: K-Fold and GroupKFold for robust performance estimation
-- **Hyperparameter Tuning**: GridSearchCV, RandomizedSearchCV for model optimization
-- **Feature Interactions**: Polynomial features, interaction terms (e.g., window × inlet_angle)
-- **Explainability**: SHAP values, LIME for model interpretation
-- **Time-Series Analysis**: If temporal structure exists in the data
-- **Model Deployment**: Flask, FastAPI for REST API
-- **Automated ML**: AutoML frameworks (AutoSklearn, H2O AutoML)
-
-## Author
-
-Built with attention to professional standards and best practices in data science and ML engineering.
-
----
-
-**For questions or improvements, refer to the modular structure and comments in each source file.**
+- K-Fold and GroupKFold cross-validation for robust validation
+- Hyperparameter tuning (GridSearchCV)
+- Feature interactions and polynomial features
+- Model explainability (SHAP values)
+- REST API deployment
